@@ -2,6 +2,8 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 const cron = require('node-cron');
+const nodemailer = require('nodemailer');
+
 const PORT = 5000; 
 
 const retryFunction=(functionToRetry)=>{
@@ -28,11 +30,35 @@ const retryFunction=(functionToRetry)=>{
 app.use(cors());
 app.use(express.json());
 
-// Schedule a task to run every second
-cron.schedule('* * * * *', () => {
-    console.log('Running a task every second!');
-    // Add your task logic here
-  });
+const sendEmail=()=>{
+    var transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: 'aaronbalzacthedj@gmail.com',
+            pass: 'qbxh tswp xeat slpl'
+        }
+    });
+
+    var mailOptions = {
+        from: 'aaronbalzacthedj@gmail.com',
+        to: 'aryangiroud@gmail.com',
+        subject: 'Are you alive ?',
+        text: 'No idea'
+    };
+
+    transporter.sendMail(mailOptions, function(error, info){
+        if (error) {
+            console.log(error);
+        } else {
+            console.log('Email sent: ' + info.response);
+        }
+    }); 
+}
+// // Schedule a task to run every second
+// cron.schedule('* * * * *', () => {
+//     console.log('Running a task every second!');
+//     // Add your task logic here
+//   });
 
 //ROUTES
 
@@ -46,6 +72,7 @@ app.post("/read",async(req,res)=>{
     }
 })
 
+// sendEmail();
 
 // LISTEN ON PORT 5000
 app.listen(PORT, ()=>{
