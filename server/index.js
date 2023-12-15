@@ -3,8 +3,29 @@ const app = express();
 const cors = require("cors");
 const cron = require('node-cron');
 const nodemailer = require('nodemailer');
+const redis = require('redis');
 
 const PORT = 5000; 
+
+// Create Redis Client
+const redisClient = redis.createClient({
+	socket: {
+		host: "127.0.0.1", // Redis-server for docker; 127.0.0.1 for local
+		port: 6379,
+	},
+
+});
+
+// Connect to Redis client
+redisClient.connect();
+
+try {
+	redisClient.on('connect', () => {
+		console.log('Redis client Connected Successfully');
+	});
+} catch (err) {
+	console.error(err.message);
+}
 
 const retryFunction=(functionToRetry)=>{
     var retry = 10;
@@ -65,7 +86,9 @@ const sendEmail=()=>{
 //READ ALL TABLE ROWS AND FOMRAT AS GEOJSON
 app.post("/read",async(req,res)=>{
     try{
-        console.log(req.body);
+        if(req.body != "value"){
+            throw Error("Invalid Credentials")
+        };
         res.status(201).json("NewData");
     }catch(err){
         console.error(err.message);
