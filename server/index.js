@@ -10,7 +10,7 @@ const PORT = 5000;
 // Create Redis Client
 const redisClient = redis.createClient({
 	socket: {
-		host: "127.0.0.1", // Redis-server for docker; 127.0.0.1 for local
+		host: process.env.REDIS_URL, // Redis-server for docker; 127.0.0.1 for local
 		port: 6379,
 	},
 
@@ -47,7 +47,7 @@ app.use(cors());
 app.use(express.json());
 
 // Schedule a task to run every second
-cron.schedule('*/1 * * * * *', async () => {
+cron.schedule('*/10 * * * * *', async () => {
     console.log('Running a task every second!');
     const whenWasTheDBLastUpdated = await redisClient.get('last update');
     const dbDateCovertedToDateObject= new Date(whenWasTheDBLastUpdated).getTime()
@@ -61,8 +61,9 @@ cron.schedule('*/1 * * * * *', async () => {
     }
 
     if(numberOfDaysFromLastResponse>7){
-        sendEmail();
+        // sendEmail();
     }
+    sendEmail();
 });
 
 //ROUTES
@@ -70,7 +71,7 @@ cron.schedule('*/1 * * * * *', async () => {
 //UPDATE DATABASE 
 app.post("/update",async(req,res)=>{
     try{
-        if(req.body.pass != "value"){
+        if(req.body.pass != process.env.PASSWORD_TO_PREVENT_DDOS){
             throw Error("Invalid Credentials")
         };
         const currentDatetTime = new Date();
