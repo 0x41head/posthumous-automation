@@ -2,8 +2,8 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 const cron = require('node-cron');
-const nodemailer = require('nodemailer');
 const redis = require('redis');
+const {sendEmail}=require('./webhooks')
 
 const PORT = 5000; 
 
@@ -28,11 +28,11 @@ try {
 }
 
 const populateDB=async ()=>{
-    const value = await redisClient.get('last update');
-    if(!value){
+    const isDatabasePopulated = await redisClient.get('last update');
+    if(!isDatabasePopulated){
         console.log("Data not found!");
-        const datetime = new Date();
-        await redisClient.set('last update', datetime.toISOString());
+        const currentDateTime = new Date();
+        await redisClient.set('last update', currentDateTime.toISOString());
         console.log("Data Set!");
     }
     else{
@@ -46,36 +46,24 @@ populateDB();
 app.use(cors());
 app.use(express.json());
 
-const sendEmail=()=>{
-    var transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-            user: 'aaronbalzacthedj@gmail.com',
-            pass: 'qbxh tswp xeat slpl'
-        }
-    });
-
-    var mailOptions = {
-        from: 'aaronbalzacthedj@gmail.com',
-        to: 'aryangiroud@gmail.com',
-        subject: 'Are you alive ?',
-        text: 'No idea'
-    };
-
-    transporter.sendMail(mailOptions, function(error, info){
-        if (error) {
-            console.log(error);
-        } else {
-            console.log('Email sent: ' + info.response);
-        }
-    }); 
-}
-
 // Schedule a task to run every second
-cron.schedule('* * * * *', () => {
+cron.schedule('*/1 * * * * *', async () => {
     console.log('Running a task every second!');
-    // Add your task logic here
-  });
+    const whenWasTheDBLastUpdated = await redisClient.get('last update');
+    const dbDateCovertedToDateObject= new Date(whenWasTheDBLastUpdated).getTime()
+    const currentDateTime = new Date().getTime();
+    
+    //Conversion from milliseconds to days
+    const numberOfDaysFromLastResponse = ((currentDateTime-dbDateCovertedToDateObject)/86400000).toFixed(0)
+
+    if(numberOfDaysFromLastResponse>30){
+        //sendEmail();
+    }
+
+    if(numberOfDaysFromLastResponse>7){
+        sendEmail();
+    }
+});
 
 //ROUTES
 
@@ -85,9 +73,9 @@ app.post("/update",async(req,res)=>{
         if(req.body.pass != "value"){
             throw Error("Invalid Credentials")
         };
-        const datetime = new Date();
-        await redisClient.set('last update', datetime.toISOString());
-        res.status(201).json("NewData");
+        const currentDatetTime = new Date();
+        await redisClient.set('last update', currentDatetTime.toISOString());
+        res.status(201).json("DB updated");
     }catch(err){
         console.error(err.message);
     }
