@@ -27,25 +27,20 @@ try {
 	console.error(err.message);
 }
 
-const retryFunction=(functionToRetry)=>{
-    var retry = 10;
-    while(retry){
-        try { 
-            functionToRetry();
-            break;
-        }
-        catch (err) {
-            if (retry>0){
-                retry=retry-1;
-                console.log(retry+ " retries left")
-            }
-            else{
-                console.log(err.message)
-            }
-        }
+const populateDB=async ()=>{
+    const value = await redisClient.get('last update');
+    if(!value){
+        console.log("Data not found!");
+        const datetime = new Date();
+        await redisClient.set('last update', datetime.toISOString());
+        console.log("Data Set!");
     }
+    else{
+        console.log("Data found!");
+    }
+}
 
-};
+populateDB();
 
 //MIDDLEWARE
 app.use(cors());
@@ -75,20 +70,23 @@ const sendEmail=()=>{
         }
     }); 
 }
-// // Schedule a task to run every second
-// cron.schedule('* * * * *', () => {
-//     console.log('Running a task every second!');
-//     // Add your task logic here
-//   });
+
+// Schedule a task to run every second
+cron.schedule('* * * * *', () => {
+    console.log('Running a task every second!');
+    // Add your task logic here
+  });
 
 //ROUTES
 
-//READ ALL TABLE ROWS AND FOMRAT AS GEOJSON
-app.post("/read",async(req,res)=>{
+//UPDATE DATABASE 
+app.post("/update",async(req,res)=>{
     try{
-        if(req.body != "value"){
+        if(req.body.pass != "value"){
             throw Error("Invalid Credentials")
         };
+        const datetime = new Date();
+        await redisClient.set('last update', datetime.toISOString());
         res.status(201).json("NewData");
     }catch(err){
         console.error(err.message);
