@@ -56,14 +56,18 @@ cron.schedule('*/10 * * * * *', async () => {
     //Conversion from milliseconds to days
     const numberOfDaysFromLastResponse = ((currentDateTime-dbDateCovertedToDateObject)/86400000).toFixed(0)
 
+    // Damn I really died or I am potentailly stuck on a place with no internet. Probably the former
     if(numberOfDaysFromLastResponse>30){
         //sendEmail();
     }
 
     if(numberOfDaysFromLastResponse>7){
-        // sendEmail();
+        sendEmail(process.env.PRIMARY_MAIL,"Are You Alive?","pLease be alive");
     }
-    sendEmail();
+
+    // sendEmail(process.env.PRIMARY_MAIL,"Are You Alive?","pLease be alive");
+    //FOR DEVELOPEMENT ONLY
+    console.log("DB Last Updated:",whenWasTheDBLastUpdated)
 });
 
 //ROUTES
@@ -72,6 +76,7 @@ cron.schedule('*/10 * * * * *', async () => {
 app.post("/update",async(req,res)=>{
     try{
         if(req.body.pass != process.env.PASSWORD_TO_PREVENT_DDOS){
+            res.status(403).json("Invalid Credentials");
             throw Error("Invalid Credentials")
         };
         const currentDatetTime = new Date();
@@ -79,6 +84,7 @@ app.post("/update",async(req,res)=>{
         res.status(201).json("DB updated");
     }catch(err){
         console.error(err.message);
+        res.status(500).json("Something went wrong");
     }
 })
 

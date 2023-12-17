@@ -34,7 +34,7 @@ app/*.pem
 
 # local env files
 app/.env*.local
-app/server/.env*.local
+server/.env*.local
 
 
 # typescript
