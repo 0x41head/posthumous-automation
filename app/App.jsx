@@ -73,13 +73,12 @@ const onButtonPress = (password) => {
 };
 
 function App() {
-  console.log('process.env.EXPO_PUBLIC_BACKEND_API', process.env.EXPO_PUBLIC_BACKEND_API);
   const [password, setPassword] = useState(() => {
     if (Platform.OS === 'web') {
       return 'nope';
     }
 
-    return 'value';
+    return process.env.EXPO_PUBLIC_PASSWORD;
   });
 
   const [expoPushToken, setExpoPushToken] = useState('');

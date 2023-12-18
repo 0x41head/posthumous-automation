@@ -72,6 +72,12 @@ cron.schedule('*/10 * * * * *', async () => {
 
 //ROUTES
 
+app.all('/*', function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "X-Requested-With");
+    next();
+  });
+  
 //UPDATE DATABASE 
 app.post("/update",async(req,res)=>{
     try{
