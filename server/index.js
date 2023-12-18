@@ -86,7 +86,7 @@ app.post("/update",async(req,res)=>{
         };
         const currentDatetTime = new Date();
         await redisClient.set('last update', currentDatetTime.toISOString());
-        res.status(201).json("DB updated");
+        res.status(201).json("DB updated: "+currentDatetTime.toISOString());
     }catch(err){
         console.error(err.message);
         res.status(500).json("Something went wrong");
