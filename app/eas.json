@@ -19,6 +19,16 @@
     "preview4": {
       "distribution": "internal"
     },
-    "production": {}
+    "production": {
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_BACKEND_API":"http://146.190.8.124:5000/update",
+        "EXPO_PUBLIC_PASSWORD":"disgracia!11@11"
+      }
+
+
+    }
   }
 }
