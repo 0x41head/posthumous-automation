@@ -9,7 +9,6 @@ blogpost/
 
 # Expo
 app/.expo/
-app/dist/
 app/web-build/
 
 # Native
