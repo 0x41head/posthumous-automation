@@ -20,4 +20,4 @@ COPY . .
 EXPOSE 19006
 
 # Start the Expo web server
-CMD ["expo","start","--web", "--https", "-c"]
+CMD ["npx", "expo","start","--web"]
