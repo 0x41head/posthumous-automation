@@ -46,7 +46,7 @@ const buttonStyles = StyleSheet.create({
 });
 
 const updateDB = (password) => {
-  fetch('http://139.59.55.69:5000/update', {
+  fetch(process.env.EXPO_PUBLIC_BACKEND_API, {
     method: 'POST',
     headers: {
       Accept: 'application/json',
@@ -66,11 +66,14 @@ const updateDB = (password) => {
 
 const onButtonPress = (password) => {
   updateDB(password);
-  Notifications.cancelAllScheduledNotificationsAsync();
-  schedulePushNotification();
+  if (Platform.OS !== 'web') {
+    Notifications.cancelAllScheduledNotificationsAsync();
+    schedulePushNotification();
+  }
 };
 
 function App() {
+  console.log('process.env.EXPO_PUBLIC_BACKEND_API', process.env.EXPO_PUBLIC_BACKEND_API);
   const [password, setPassword] = useState(() => {
     if (Platform.OS === 'web') {
       return 'nope';
