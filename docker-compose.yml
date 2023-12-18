@@ -14,15 +14,15 @@ services:
     depends_on:
       - redis-server
 
-  frontend:
-    container_name: frontend
-    build:
-      context: ./app
-      dockerfile: Dockerfile 
-    ports:
-      - "19006:19006"
-    depends_on:
-      - backend
+  # frontend:
+  #   container_name: frontend
+  #   build:
+  #     context: ./app
+  #     dockerfile: Dockerfile 
+  #   ports:
+  #     - "19006:19006"
+  #   depends_on:
+  #     - backend
   
   
 
