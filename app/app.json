@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "app",
+    "name": "posthumous",
     "slug": "app",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -21,10 +21,24 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.me.fuck"
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "96a74cd7-a6b0-4516-ae20-7e2932966009"
+      }
+    },
+    "plugins": [
+      ["expo-build-properties", {
+        "android": {
+          "usesCleartextTraffic": true
+        },
+        "ios": {}
+      }]
+    ]
   }
 }
