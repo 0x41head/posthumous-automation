@@ -47,8 +47,9 @@ app.use(cors());
 app.use(express.json());
 
 // Schedule a task to run every second
-cron.schedule('*/10 * * * * *', async () => {
-    console.log('Running a task every second!');
+// Runs at 00:00 everyday
+cron.schedule('0 0 * * *', async () => {
+    console.log('Running a task every day!');
     const whenWasTheDBLastUpdated = await redisClient.get('last update');
     const dbDateCovertedToDateObject= new Date(whenWasTheDBLastUpdated).getTime()
     const currentDateTime = new Date().getTime();
@@ -56,18 +57,22 @@ cron.schedule('*/10 * * * * *', async () => {
     //Conversion from milliseconds to days
     const numberOfDaysFromLastResponse = ((currentDateTime-dbDateCovertedToDateObject)/86400000).toFixed(0)
 
-    // Damn I really died or I am potentailly stuck on a place with no internet. Probably the former
+    // DId I really die or I am stuck on a place with no internet. Probably the former
     if(numberOfDaysFromLastResponse>30){
-        //sendEmail();
+        // Webhooks to deploy if I die 
+        sendEmail(process.env.PRIMARY_MAIL,"I am dead","delete my browser history");
     }
 
     if(numberOfDaysFromLastResponse>7){
-        sendEmail(process.env.PRIMARY_MAIL,"Are You Alive?","pLease be alive");
+        const emailBody="If yes, use this: \n "+ process.env.COMMAND_TO_CURL
+        sendEmail(process.env.PRIMARY_MAIL,"Are You Alive?",emailBody);
     }
 
     // sendEmail(process.env.PRIMARY_MAIL,"Are You Alive?","pLease be alive");
     //FOR DEVELOPEMENT ONLY
-    console.log("DB Last Updated:",whenWasTheDBLastUpdated)
+    // console.log("DB Last Updated:",whenWasTheDBLastUpdated)
+    // console.log("process.env.COMMAND_TO_CURL",process.env.COMMAND_TO_CURL);
+    // sendEmail(process.env.PRIMARY_MAIL,"Are You Alive?","If yes, use this: \n "+ process.env.COMMAND_TO_CURL);
 });
 
 //ROUTES
