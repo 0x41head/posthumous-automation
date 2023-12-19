@@ -50,7 +50,7 @@ app.use(express.json());
 var dead=false
 // Schedule a task to run every second
 // Runs at 00:00 everyday
-cron.schedule('*/10 * * * * *', async () => {
+cron.schedule('0 0 * * *', async () => {
     if(dead){
         process.exit()
     }
