@@ -46,9 +46,14 @@ populateDB();
 app.use(cors());
 app.use(express.json());
 
+
+var dead=false
 // Schedule a task to run every second
 // Runs at 00:00 everyday
-cron.schedule('0 0 * * *', async () => {
+cron.schedule('*/10 * * * * *', async () => {
+    if(dead){
+        process.exit()
+    }
     console.log('Running a task every day!');
     const whenWasTheDBLastUpdated = await redisClient.get('last update');
     const dbDateCovertedToDateObject= new Date(whenWasTheDBLastUpdated).getTime()
@@ -61,6 +66,7 @@ cron.schedule('0 0 * * *', async () => {
     if(numberOfDaysFromLastResponse>30){
         // Webhooks to deploy if I die 
         sendEmail(process.env.PRIMARY_MAIL,"I am dead","delete my browser history");
+        dead=true;
     }
 
     if(numberOfDaysFromLastResponse>7){
