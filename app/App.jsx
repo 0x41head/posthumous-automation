@@ -3,6 +3,8 @@ import {
   Image, Pressable, StyleSheet, Text, View, Platform, TextInput,
 } from 'react-native';
 import * as Notifications from 'expo-notifications';
+import { RootSiblingParent } from 'react-native-root-siblings';
+import Toast from 'react-native-root-toast';
 import { registerForPushNotificationsAsync, schedulePushNotification } from './handlers/notification';
 
 const styles = StyleSheet.create({
@@ -49,7 +51,6 @@ const updateDB = (password) => {
   fetch(process.env.EXPO_PUBLIC_BACKEND_API, {
     method: 'POST',
     headers: {
-      Accept: 'application/json',
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({ pass: password }),
@@ -57,10 +58,15 @@ const updateDB = (password) => {
     .then((response) => response.json())
     .then((data) => {
       console.log('POST Request Data:', data);
-    // Handle the response data after POST request
+      Toast.show('Request sent successfully.', {
+        duration: Toast.durations.LONG,
+      });
     })
     .catch((error) => {
       console.error('Error posting data:', error);
+      Toast.show('Request failed to send.', {
+        duration: Toast.durations.LONG,
+      });
     });
 };
 
@@ -73,13 +79,7 @@ const onButtonPress = (password) => {
 };
 
 function App() {
-  const [password, setPassword] = useState(() => {
-    if (Platform.OS === 'web') {
-      return 'nope';
-    }
-
-    return process.env.EXPO_PUBLIC_PASSWORD;
-  });
+  const password = process.env.EXPO_PUBLIC_PASSWORD;
 
   const [expoPushToken, setExpoPushToken] = useState('');
   const [notification, setNotification] = useState(false);
@@ -104,42 +104,37 @@ function App() {
   }, []);
 
   return (
-    <View style={styles.app}>
-      <Image
-        accessibilityLabel="Hi!"
-        source={require('./assets/hi.png')}
-        style={styles.img}
-      />
-      <Text style={styles.title}>
-        Are you alive ?
-      </Text>
-      {(Platform.OS === 'web') && (
-      <TextInput
-        style={styles.input}
-        onChangeText={setPassword}
-        value={password}
-        placeholder="password"
-      />
-      )}
-      <Pressable
-        onPress={() => { onButtonPress(password); }}
-        style={({ pressed }) => [
-          {
-            backgroundColor: pressed ? '#fff' : '#2196F3',
-          },
-          buttonStyles.button,
-        ]}
-      >
-        {({ pressed }) => (
-          <Text style={[{
-            color: pressed ? '#2196F3' : '#fff',
-          }, buttonStyles.text]}
-          >
-            Yes
-          </Text>
-        )}
-      </Pressable>
-    </View>
+    <RootSiblingParent>
+      <View style={styles.app}>
+        <Image
+          accessibilityLabel="Hi!"
+          source={require('./assets/hi.png')}
+          style={styles.img}
+        />
+        <Text style={styles.title}>
+          Are you alive ?
+        </Text>
+        <Pressable
+          onPress={() => { onButtonPress(password); }}
+          style={({ pressed }) => [
+            {
+              backgroundColor: pressed ? '#fff' : '#2196F3',
+            },
+            buttonStyles.button,
+          ]}
+        >
+          {({ pressed }) => (
+            <Text style={[{
+              color: pressed ? '#2196F3' : '#fff',
+            }, buttonStyles.text]}
+            >
+              Yes
+            </Text>
+          )}
+        </Pressable>
+      </View>
+    </RootSiblingParent>
+
   );
 }
 
